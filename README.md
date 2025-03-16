@@ -13,3 +13,8 @@ This project aims to develop an **AI-powered system** that recognizes **sign lan
 - **MobileNet-based CNN** for fast and efficient gesture classification.
 - **JSON-based class mapping** for flexible model expansion.
 - **Cross-Origin Resource Sharing (CORS)** enabled for frontend compatibility.
+
+## **Demo**
+[![Watch the video](https://raw.githubusercontent.com/mihaivasile17/Automatic-translation-of-sign-language-into-text/main/D:/ProiecteBonus/Automatic-translation-of-sign-language-into-text/git_demo/Thumbnail_hand_recognition.jpeg)](https://raw.githubusercontent.com/mihaivasile17/Automatic-translation-of-sign-language-into-text/main/D:/ProiecteBonus/Automatic-translation-of-sign-language-into-text/git_demo/Video_demo_hand_recognition.mp4)
+
+
