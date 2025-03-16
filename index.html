@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Setările documentului -->
+  <meta charset="UTF-8"> <!-- Definim setul de caractere folosit -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Permite o afișare corectă pe dispozitive mobile -->
+  <title>Sign language detection</title> <!-- Titlul paginii web -->
+
+  <!-- ✅ Stilizare CSS pentru pagină -->
+  <style>
+    /* ✅ Stilizarea corpului paginii */
+    body {
+      font-family: Arial, sans-serif; /* Font modern, ușor de citit */
+      background-color: #1a1a1a; /* Fundal întunecat */
+      color: #f1f1f1; /* Text deschis la culoare */
+      margin: 0; /* Eliminăm marginile implicite */
+      padding: 0; /* Eliminăm padding-ul implicit */
+      display: flex; /* Permitem aranjarea conținutului pe axa verticală */
+      flex-direction: column; /* Aranjăm elementele vertical */
+      min-height: 100vh; /* Asigurăm că pagina ocupă întreg ecranul */
+    }
+
+    /* ✅ Stilizare antet (header) */
+    header {
+      background-color: #007BFF; /* Albastru vibrant */
+      color: white; /* Text alb */
+      padding: 1rem 0; /* Spațiere verticală */
+      text-align: center; /* Centrare text */
+    }
+
+    /* ✅ Stilizare secțiunea principală */
+    main {
+      flex: 1; /* Permite extinderea secțiunii principale */
+      max-width: 600px; /* Limităm lățimea maximă */
+      margin: 1.5rem auto; /* Centrare pe pagină */
+      padding: 1.5rem; /* Spațiere interioară */
+      background-color: #292929; /* Fundal închis */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Adăugăm o umbră pentru efect 3D */
+      border-radius: 8px; /* Colțuri rotunjite */
+    }
+
+    /* ✅ Stilizare titluri */
+    h1 {
+      margin-top: 0; /* Eliminăm marginile de sus */
+    }
+
+    /* ✅ Stilizare etichete (label) */
+    label {
+      font-weight: bold; /* Bold pentru vizibilitate */
+      display: block; /* Afișare pe linie separată */
+      margin-bottom: 0.5rem; /* Spațiere sub etichetă */
+      color: #e0e0e0; /* Gri deschis */
+    }
+
+    /* ✅ Stilizare input pentru încărcare imagine */
+    input[type="file"] {
+      display: block; /* Afișare pe linie separată */
+      margin: 1rem 0; /* Spațiere */
+      color: #e0e0e0; /* Culoare gri deschis */
+    }
+
+    /* ✅ Stilizare buton */
+    button {
+      background-color: #007BFF; /* Albastru vibrant */
+      color: white; /* Text alb */
+      padding: 0.8rem 1.5rem; /* Spațiere interioară */
+      font-size: 1rem; /* Dimensiune font */
+      border: none; /* Eliminăm bordura */
+      border-radius: 5px; /* Colțuri rotunjite */
+      cursor: pointer; /* Cursor pointer */
+      transition: background-color 0.3s, transform 0.2s; /* Efecte la hover */
+    }
+
+    /* ✅ Efecte hover pentru buton */
+    button:hover {
+      background-color: #0056b3; /* Schimbare culoare la hover */
+      transform: scale(1.05); /* Mărim butonul ușor */
+    }
+
+    /* ✅ Stilizare zona de rezultat */
+    pre {
+      background-color: #333333; /* Fundal închis */
+      padding: 1rem; /* Spațiere */
+      border-radius: 5px; /* Colțuri rotunjite */
+      font-size: 1rem; /* Dimensiune font */
+      white-space: pre-wrap; /* Permitem textului să treacă la linia următoare */
+      word-wrap: break-word; /* Evităm depășirea marginilor */
+      margin-top: 1rem; /* Spațiere deasupra */
+      color: #d4d4d4; /* Culoare text */
+    }
+
+    /* ✅ Stilizare imagine previzualizare */
+    img {
+      max-width: 100%; /* Lățime maximă */
+      max-height: 200px; /* Înălțime maximă */
+      margin: 1rem 0; /* Spațiere */
+      border-radius: 8px; /* Colțuri rotunjite */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Umbră pentru efect 3D */
+    }
+
+    /* ✅ Stilizare footer */
+    footer {
+      text-align: center; /* Centrare text */
+      padding: 1rem 0; /* Spațiere */
+      font-size: 0.9rem; /* Dimensiune font mică */
+      color: #888; /* Gri deschis */
+      background-color: #222222; /* Fundal închis */
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ✅ Antetul paginii -->
+  <header>
+    <h1>Sign language detection</h1> <!-- Titlul aplicației -->
+  </header>
+
+  <!-- ✅ Secțiunea principală -->
+  <main>
+    <!-- Form pentru încărcarea unei imagini -->
+    <form id="uploadForm" action="http://127.0.0.1:5000/predict_image" method="POST" enctype="multipart/form-data">
+      <label for="image">Upload an image of a hand gesture:</label>
+      <input type="file" id="image" name="image" accept="image/*"> <!-- Input pentru imagine -->
+      <img id="preview" src="#" alt="Image Preview" style="display: none;"> <!-- Previzualizare imagine -->
+      <button type="submit">Predict gesture</button> <!-- Buton pentru trimiterea imaginii -->
+    </form>
+    
+    <!-- ✅ Afișarea rezultatului -->
+    <h2>Prediction result:</h2>
+    <pre id="result">Awaiting result...</pre>
+  </main>
+
+  <!-- ✅ Secțiune de script -->
+  <script>
+    const form = document.getElementById('uploadForm'); // Selectăm formularul
+    const resultDiv = document.getElementById('result'); // Selectăm zona de rezultat
+    const imageInput = document.getElementById('image'); // Selectăm input-ul pentru imagine
+    const preview = document.getElementById('preview'); // Selectăm imaginea de previzualizare
+
+    // ✅ Funcție pentru previzualizarea imaginii selectate
+    imageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0]; // Preluăm fișierul selectat
+      if (file) {
+        const reader = new FileReader(); // Creăm un obiect pentru a citi fișierul
+        reader.onload = (e) => {
+          preview.src = e.target.result; // Setăm sursa imaginii
+          preview.style.display = 'block'; // Afișăm imaginea
+        };
+        reader.readAsDataURL(file); // Citim imaginea ca URL
+      } else {
+        preview.src = '#'; // Resetăm imaginea
+        preview.style.display = 'none'; // Ascundem previzualizarea
+      }
+    });
+
+    // ✅ Funcție pentru trimiterea imaginii către server și obținerea rezultatului
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevenim trimiterea clasică a formularului
+
+      const formData = new FormData(form); // Creăm un obiect FormData cu datele din formular
+
+      try {
+        const response = await fetch(form.action, { // Facem cererea către server
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json(); // Extragem datele JSON
+          const confidence = parseFloat(data.confidence); // Obținem încrederea predicției
+          const label = confidence >= 80 ? data.label : "Unknown"; // Stabilim eticheta finală
+          resultDiv.textContent = `Gesture: ${label}, Confidence: ${confidence.toFixed(2)}%`; // Afișăm rezultatul
+        } else {
+          resultDiv.textContent = 'Error: Unable to process the request.'; // Mesaj de eroare
+        }
+      } catch (error) {
+        resultDiv.textContent = `Error: ${error.message}`; // Afișăm eroarea
+      }
+    });
+  </script>
+</body>
+</html>
